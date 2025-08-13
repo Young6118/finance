@@ -78,6 +78,16 @@ export class MarketDataController {
     return await this.marketDataService.getVIXData();
   }
 
+  @Get('vix/detailed')
+  @ApiOperation({ summary: '获取详细VIX数据' })
+  @ApiResponse({ 
+    status: 200, 
+    description: '返回详细的VIX数据，包括上证、深证和综合VIX' 
+  })
+  async getDetailedVIXData() {
+    return await this.marketDataService.getDetailedVIXData();
+  }
+
   @Get('query')
   @ApiOperation({ summary: '查询历史市场数据' })
   @ApiQuery({ name: 'dataType', required: false, description: '数据类型' })

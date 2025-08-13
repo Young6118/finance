@@ -5,6 +5,7 @@ import moment from 'moment';
 import { MarketDataEntity } from '../../entities/market-data.entity';
 import { BaseService } from '../../common/base.service';
 import { ValidationUtils } from '../../common/validation.utils';
+import { VIXUtils } from '../../common/vix.utils';
 
 export interface MarketDataQueryOptions {
   dataType?: string;
@@ -30,6 +31,7 @@ export class MarketDataService extends BaseService {
   constructor(
     @InjectRepository(MarketDataEntity)
     private readonly marketDataRepo: Repository<MarketDataEntity>,
+    private readonly vixUtils: VIXUtils, // 添加VIX工具类
   ) {
     super(MarketDataService.name);
   }
@@ -93,10 +95,134 @@ export class MarketDataService extends BaseService {
 
   /**
    * 获取VIX指数数据（从数据库）
-   * 注意：此数据源已被移除，调用此方法将抛出错误
    */
   async getVIXData(): Promise<{ value: number; timestamp: string }> {
-    throw new Error('VIX数据源已被移除，请等待真实数据源接入');
+    try {
+      // 获取最新的VIX数据
+      const latestVIX = await this.marketDataRepo.findOne({
+        where: {
+          dataType: 'vix',
+          isValid: true
+        },
+        order: {
+          createdAt: 'DESC'
+        }
+      });
+
+      if (latestVIX && latestVIX.rawData) {
+        const parsedData = JSON.parse(latestVIX.rawData);
+        
+        // 检查数据格式，支持两种存储格式
+        let vixData;
+        if (parsedData.parsed) {
+          // 新格式：{ original: {...}, parsed: {...} }
+          vixData = parsedData.parsed;
+        } else if (parsedData.compositeVIX !== undefined) {
+          // 旧格式：直接包含VIX数据
+          vixData = parsedData;
+        } else {
+          this.logger.warn('VIX数据格式不支持:', parsedData);
+          return {
+            value: -1,
+            timestamp: latestVIX.createdAt.toISOString()
+          };
+        }
+        
+        return {
+          value: vixData.compositeVIX || -1,
+          timestamp: latestVIX.createdAt.toISOString()
+        };
+      }
+
+      // 如果没有数据，返回-1
+      return {
+        value: -1,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      this.logger.error('获取VIX数据失败:', error);
+      return {
+        value: -1,
+        timestamp: new Date().toISOString()
+      };
+    }
+  }
+
+  /**
+   * 获取详细的VIX数据
+   */
+  async getDetailedVIXData(): Promise<{
+    shanghaiVIX: number;
+    shenzhenVIX: number;
+    compositeVIX: number;
+    sentiment: string;
+    advice: string;
+    timestamp: string;
+  }> {
+    try {
+      const latestVIX = await this.marketDataRepo.findOne({
+        where: {
+          dataType: 'vix',
+          isValid: true
+        },
+        order: {
+          createdAt: 'DESC'
+        }
+      });
+
+      if (latestVIX && latestVIX.rawData) {
+        const parsedData = JSON.parse(latestVIX.rawData);
+        
+        // 检查数据格式，支持两种存储格式
+        let vixData;
+        if (parsedData.parsed) {
+          // 新格式：{ original: {...}, parsed: {...} }
+          vixData = parsedData.parsed;
+        } else if (parsedData.shanghaiVIX !== undefined) {
+          // 旧格式：直接包含VIX数据
+          vixData = parsedData;
+        } else {
+          this.logger.warn('VIX数据格式不支持:', parsedData);
+          return {
+            shanghaiVIX: -1,
+            shenzhenVIX: -1,
+            compositeVIX: -1,
+            sentiment: '数据不足',
+            advice: '无法提供建议',
+            timestamp: latestVIX.createdAt.toISOString()
+          };
+        }
+        
+        return {
+          shanghaiVIX: vixData.shanghaiVIX || -1,
+          shenzhenVIX: vixData.shenzhenVIX || -1,
+          compositeVIX: vixData.compositeVIX || -1,
+          sentiment: vixData.sentiment || '数据不足',
+          advice: vixData.advice || '无法提供建议',
+          timestamp: latestVIX.createdAt.toISOString()
+        };
+      }
+
+      // 返回-1表示无数据
+      return {
+        shanghaiVIX: -1,
+        shenzhenVIX: -1,
+        compositeVIX: -1,
+        sentiment: '数据不足',
+        advice: '无法提供建议',
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      this.logger.error('获取详细VIX数据失败:', error);
+      return {
+        shanghaiVIX: -1,
+        shenzhenVIX: -1,
+        compositeVIX: -1,
+        sentiment: '数据不足',
+        advice: '无法提供建议',
+        timestamp: new Date().toISOString()
+      };
+    }
   }
 
   /**
