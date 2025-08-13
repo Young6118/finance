@@ -1,0 +1,32 @@
+MIT License
+
+Copyright (c) 2024 智能投研辅助交易系统
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+## 附加免责声明
+
+本软件仅作为投资辅助分析工具，不构成任何具体的投资建议。使用者应当：
+
+1. **风险自担**：投资决策完全由使用者自主做出，软件作者不对任何投资损失承担责任
+2. **数据仅供参考**：软件提供的数据分析和建议仅供参考，不保证准确性和时效性
+3. **合规使用**：使用者应确保在当地法律法规允许的范围内使用本软件
+4. **独立判断**：鼓励使用者结合多种信息来源和专业建议进行独立判断
+
+投资有风险，入市需谨慎。请在充分了解相关风险的基础上，理性投资。
